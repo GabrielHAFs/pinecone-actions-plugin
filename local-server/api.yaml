@@ -1,0 +1,116 @@
+openapi: 3.1.0
+info:
+  title: Pinecone API
+  description: API for performing upsert and query operations on Pinecone indexes.
+  version: 1.0.0
+servers:
+  - url: https://localhost
+    description: Local server
+paths:
+  /indexes/{indexName}:
+    get:
+      operationId: describeIndex
+      summary: Describe an index to get its endpoint.
+      parameters:
+        - name: indexName
+          in: path
+          required: true
+          description: The name of the index to describe.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved the index description.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  host:
+                    type: string
+  /vectors/upsert:
+    post:
+      operationId: upsertVectors
+      summary: Upsert vectors into the specified namespace of the index.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vectors:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      values:
+                        type: array
+                        items:
+                          type: number
+                      metadata:
+                        type: object
+                namespace:
+                  type: string
+                  nullable: true
+      responses:
+        "200":
+          description: Successfully upserted vectors.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  upsertedCount:
+                    type: integer
+  /query:
+    post:
+      operationId: queryVectors
+      summary: Query vectors in the specified namespace of the index.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                namespace:
+                  type: string
+                  nullable: true
+                vector:
+                  type: array
+                  items:
+                    type: number
+                topK:
+                  type: integer
+                includeValues:
+                  type: boolean
+                includeMetadata:
+                  type: boolean
+                filter:
+                  type: object
+      responses:
+        "200":
+          description: Successfully queried vectors.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  matches:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        score:
+                          type: number
+                        values:
+                          type: array
+                          items:
+                            type: number
+                        metadata:
+                          type: object
